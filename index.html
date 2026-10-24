@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DVD Screensaver</title>
+<style>
+  :root { --bg: #f5f4f4; --fg: #1a1a1a; --glow: rgba(255, 183, 77, .55); }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 32px 16px 48px; text-align: center; }
+  h1 { font-weight: 500; font-size: 2.4rem; margin: 0 0 20px; }
+
+  .layout { display: flex; gap: 24px; align-items: flex-start; justify-content: center; flex-wrap: wrap; }
+  .main-color { flex: 1 1 456px; max-width: 520px; }
+  .full-screen.saver-dvd { position: relative; overflow: hidden; background: #000; width: 100%; aspect-ratio: 16 / 9; border-radius: 12px; box-shadow: 0 0 18px 6px var(--glow); }
+  .full-screen.saver-dvd:fullscreen { border-radius: 0; box-shadow: none; aspect-ratio: auto; }
+
+  .saver-dvd-img { position: absolute; width: 20%; z-index: 2; transition: filter .15s ease; }
+  .saver-dvd-img.dvd-corner-flash { filter: drop-shadow(0 0 18px #fff) drop-shadow(0 0 32px #6cf) drop-shadow(0 0 48px #a7f); }
+
+  .dvd-corner-toast { position: absolute; top: 14px; left: 50%; transform: translateX(-50%) translateY(-8px); z-index: 6; pointer-events: none; color: #f5f5f5; font-size: 15px; font-weight: 600; text-shadow: 0 0 10px #000, 0 1px 3px #000; padding: 8px 16px; border-radius: 8px; background: rgba(0,0,0,.55); opacity: 0; visibility: hidden; transition: opacity .25s ease, transform .25s ease, visibility .25s; }
+  .dvd-corner-toast.dvd-corner-toast--visible { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+  .dvd-confetti { position: absolute; width: 7px; height: 7px; border-radius: 50%; pointer-events: none; z-index: 4; opacity: 1; animation: dvdConfettiFall .65s ease-out forwards; }
+  @keyframes dvdConfettiFall { to { transform: translate(var(--dx), var(--dy)) scale(.3); opacity: 0; } }
+
+  .fs-btn { position: absolute; right: 10px; bottom: 10px; z-index: 7; width: 34px; height: 34px; padding: 6px; border: 0; border-radius: 6px; background: transparent; color: #fff; opacity: .75; cursor: pointer; }
+  .fs-btn:hover { opacity: 1; background: rgba(255,255,255,.12); }
+  .fs-btn svg { width: 100%; height: 100%; display: block; }
+
+  .controls { flex: 0 0 200px; display: flex; flex-direction: column; gap: 14px; font-size: 14px; text-align: center; }
+  .controls label { display: block; margin-bottom: 4px; }
+  .slider { width: 100%; accent-color: #444; }
+  .hits { display: flex; gap: 8px; align-items: center; justify-content: center; text-transform: uppercase; font-size: 13px; letter-spacing: .02em; }
+  .hits button { font: inherit; text-transform: none; font-size: 12px; padding: 2px 10px; border: 1px solid #aaa; border-radius: 4px; background: #e9e9e9; cursor: pointer; }
+  select { font: inherit; font-size: 13px; padding: 3px 6px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>DVD Screensaver</h1>
+
+  <div class="layout">
+    <div class="main-color">
+      <div class="full-screen saver-dvd" id="field">
+        <svg class="saver-dvd-img" id="saver-dvd-img-id" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 300">
+          <path id="dvd-path" style="fill-rule:evenodd;clip-rule:evenodd;fill:red" d="M469.9 212.1h-14.7l-.4 2.2h6.2l-2.2 17.3h2.6l2.3-17.3h5.7zM480.1 224.9l-3.1-12.8h-1.8l-6.7 19.5h2.2l5.4-15.1 3.1 15.1 8-15.1v15.1h2.6v-19.5h-2.6zM76.2 282.1 59 249.7H44.3l27.1 49.7h8.4l27.5-49.7H92.2zM141 275.4v24h13.3v-49.7H141zM285 299.4h36.8V291h-23v-13.3h21.7v-8.5h-21.7v-11h23v-8.5H285zM472 188.1c0-18.6-105.6-33.7-236-33.7S0 169.5 0 188.1s105.7 33.7 236 33.7 236-15 236-33.7zm-298.7.5c0-6.2 24.2-11.1 54.1-11.1s54 5 54 11-24.1 11.1-54 11.1-54-5-54-11zM392.3 249.5c-19.3 0-35 11.1-35 24.8s15.7 24.8 35 24.8 35-11 35-24.8c0-13.7-15.7-24.8-35-24.8zm0 40.6c-11.5 0-20.8-7-20.8-15.8 0-8.7 9.3-15.7 20.8-15.7s20.8 7 20.8 15.7-9.3 15.8-20.8 15.8zM214.8 249.7h-21v49.7h21s33.4 0 33.4-24.6-33.4-25-33.4-25zm-7 41.2v-32.7s26.2-1.7 26.2 16.5c0 18.1-26.1 16.2-26.1 16.2zM192 54.3a78 78 0 0 0-4-26.2h1.7L234.5 154 344.5 28h59.3S450 26.8 450 56.5s-38.4 41.2-63 41.2h-10.6l13.8-59.4h-48.3l-20.4 86.4h65.8c63 0 112.8-34.6 112.8-70.4C500 1.3 418.9.6 418.9.6h-102l-64.7 81.6L227 .6H43l-6.7 27.5h61.5c8.7.2 44 2.4 44 28.4 0 29.7-38.4 41.2-62.9 41.2H68.3L82 38.3H33.7l-20.4 86.4h65.8c63 0 112.8-34.6 112.8-70.4z"/>
+        </svg>
+        <div class="dvd-corner-toast" id="dvd-corner-toast" hidden></div>
+        <button class="fs-btn" id="fs-btn" type="button" aria-label="Full screen" title="Full screen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path d="M4 4l6 6M20 4l-6 6M4 20l6-6M20 20l-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div>
+        <label for="dvd-speed-id">Speed</label>
+        <input class="slider" type="range" id="dvd-speed-id" name="dvd-speed" min="0" max="6" step="0.5" value="0.5">
+      </div>
+      <div>
+        <label for="dvd-size-id">Size</label>
+        <input class="slider" type="range" id="dvd-size-id" name="dvd-size" min="1" max="40" step="2" value="30">
+      </div>
+      <div class="hits">
+        <span id="dvd-corner-label-only">Corner hits</span>: <strong id="dvd-corner-count-num">0</strong>
+        <button type="button" id="dvd-reset">Reset</button>
+      </div>
+      <div>
+        <label for="dvd-corner-difficulty">Corner hit sensitivity</label>
+        <select id="dvd-corner-difficulty">
+          <option value="easy">Easy (10 px)</option>
+          <option value="normal" selected>Normal (4 px)</option>
+          <option value="impossible">Impossible (1 px)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// localStorage helpers (settings persist across reloads, like the original)
+const _gc = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+const _sc = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+const $ = id => document.getElementById(id);
+
+const COLORS = ["red", "blue", "green", "yellow", "purple", "orange"];
+const CONFETTI = ["#ffeb3b", "#e91e63", "#00e5ff", "#76ff03", "#fff", "#ff9800"];
+
+const field = $("field");
+const dvd = $("saver-dvd-img-id");
+const path = $("dvd-path");
+const speedEl = $("dvd-speed-id");
+const sizeEl = $("dvd-size-id");
+const diffEl = $("dvd-corner-difficulty");
+
+let speed = 0.5, dirX = 1, dirY = 1;   // speed in px per 60 Hz frame
+let posX = 0, posY = 0;
+let cornerHits = 0, wasInCorner = true;
+let color = "red";
+let toastTimer = null, toastHideTimer = null;
+
+const tolerance = () => ({ easy: 10, impossible: 1 })[diffEl.value] || 4;
+
+function newColor(prev) {
+  let c;
+  do { c = COLORS[Math.floor(Math.random() * COLORS.length)]; } while (c === prev);
+  return c;
+}
+
+function showToast() {
+  const t = $("dvd-corner-toast");
+  t.textContent = $("dvd-corner-label-only").textContent.trim() + ": " + cornerHits;
+  t.hidden = false;
+  t.classList.add("dvd-corner-toast--visible");
+  clearTimeout(toastTimer); clearTimeout(toastHideTimer);
+  toastTimer = setTimeout(() => {
+    t.classList.remove("dvd-corner-toast--visible");
+    toastHideTimer = setTimeout(() => { t.hidden = true; }, 280);
+  }, 3500);
+}
+
+function flashAndConfetti() {
+  dvd.classList.add("dvd-corner-flash");
+  setTimeout(() => dvd.classList.remove("dvd-corner-flash"), 500);
+  for (let i = 0; i < 14; i++) {
+    const s = document.createElement("span");
+    s.className = "dvd-confetti";
+    s.style.background = CONFETTI[i % CONFETTI.length];
+    s.style.left = 42 + 16 * Math.random() + "%";
+    s.style.top = 38 + 18 * Math.random() + "%";
+    s.style.setProperty("--dx", 120 * (Math.random() - .5) + "px");
+    s.style.setProperty("--dy", 140 * (Math.random() - .4) + "px");
+    field.appendChild(s);
+    setTimeout(() => s.remove(), 700);
+  }
+}
+
+function checkCorner() {
+  const tol = tolerance();
+  const W = field.clientWidth, H = field.clientHeight;
+  const w = dvd.clientWidth, h = dvd.clientHeight;
+  if (w < 2 || h < 2 || W < 2 || H < 2) return;
+  const x = Math.min(Math.max(posX, 0), W - w);
+  const y = Math.min(Math.max(posY, 0), H - h);
+  const right = W - (x + w), bottom = H - (y + h);
+  const inCorner = (x <= tol && y <= tol) || (right <= tol && y <= tol) ||
+                   (x <= tol && bottom <= tol) || (right <= tol && bottom <= tol);
+  if (inCorner && !wasInCorner) {
+    cornerHits += 1;
+    wasInCorner = true;
+    _sc("dvd-corner-hits", String(cornerHits));
+    $("dvd-corner-count-num").textContent = cornerHits;
+    flashAndConfetti();
+    showToast();
+  } else if (!inCorner) {
+    wasInCorner = false;
+  }
+}
+
+function resetHits() {
+  cornerHits = 0; wasInCorner = true;
+  _sc("dvd-corner-hits", "0");
+  $("dvd-corner-count-num").textContent = "0";
+  const t = $("dvd-corner-toast");
+  t.classList.remove("dvd-corner-toast--visible");
+  t.hidden = true;
+  clearTimeout(toastTimer); clearTimeout(toastHideTimer);
+}
+
+// controls
+speedEl.addEventListener("input", () => { speed = parseFloat(speedEl.value); _sc("dvd-speed", speedEl.value); });
+sizeEl.addEventListener("input", () => { dvd.style.width = sizeEl.value + "%"; _sc("dvd-size", sizeEl.value); });
+diffEl.addEventListener("change", () => _sc("dvd-corner-difficulty", diffEl.value));
+$("dvd-reset").addEventListener("click", resetHits);
+$("fs-btn").addEventListener("click", () => {
+  if (document.fullscreenElement) document.exitFullscreen();
+  else (field.requestFullscreen || field.webkitRequestFullscreen).call(field);
+});
+
+// restore saved state
+sizeEl.value = _gc("dvd-size") || 30;
+dvd.style.width = sizeEl.value + "%";
+speedEl.value = _gc("dvd-speed") || 0.5;
+speed = parseFloat(speedEl.value);
+const savedHits = parseInt(_gc("dvd-corner-hits"), 10);
+cornerHits = savedHits > 0 ? savedHits : 0;
+$("dvd-corner-count-num").textContent = cornerHits;
+const savedDiff = _gc("dvd-corner-difficulty");
+diffEl.value = ["easy", "normal", "impossible"].includes(savedDiff) ? savedDiff : "normal";
+
+// bounce loop: same per-frame stepping as the original, scaled so it
+// moves the same on 60 Hz and high-refresh displays
+let last = performance.now();
+function frame(now) {
+  const k = Math.min((now - last) / (1000 / 60), 4);
+  last = now;
+  const W = field.clientWidth, H = field.clientHeight;
+  const w = dvd.clientWidth, h = dvd.clientHeight;
+
+  posX += dirX * speed * k;
+  posY += dirY * speed * k;
+
+  // flip only when moving toward the wall; each bounce picks a new color
+  let bounced = false;
+  if (posX + w >= W && dirX > 0) { dirX = -1; bounced = true; }
+  else if (posX <= 0 && dirX < 0) { dirX = 1; bounced = true; }
+  if (posY + h >= H && dirY > 0) { dirY = -1; bounced = true; }
+  else if (posY <= 0 && dirY < 0) { dirY = 1; bounced = true; }
+  if (bounced) { color = newColor(color); path.style.fill = color; }
+
+  dvd.style.left = posX + "px";
+  dvd.style.top = posY + "px";
+  checkCorner();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
